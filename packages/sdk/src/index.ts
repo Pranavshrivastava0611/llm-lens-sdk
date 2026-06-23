@@ -1,6 +1,7 @@
 import { SpanExporter } from './collector/exporter.js';
 import { AutopilotSpanProcessor, AutopilotSpan } from './collector/processor.js';
-import { setInstrumentationState, instrumentVercelAI } from './instrumentation/vercel.js';
+import { setInstrumentationState } from './instrumentation/state.js';
+import { instrumentVercelAI } from './instrumentation/vercel.js';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -82,6 +83,8 @@ export async function shutdown(): Promise<void> {
 
 // ── Re-exports ───────────────────────────────────────────────────────────────
 
-export { instrumentVercelAI } from './instrumentation/vercel.js';
+export { instrumentVercelAI, withAutopilot } from './instrumentation/vercel.js';
+export { observeOpenAI, observeGroq } from './instrumentation/openai.js';
+export { LLMLensCallbackHandler } from './instrumentation/langchain.js';
 export { AutopilotSpan } from './collector/processor.js';
 export type { QueuedSpan } from './queue/SpanQueue.js';

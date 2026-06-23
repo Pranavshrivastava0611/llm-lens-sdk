@@ -2,18 +2,7 @@ import { AutopilotSpan } from '../collector/processor.js';
 
 type AnyFunction = (...args: unknown[]) => unknown;
 
-interface InstrumentationState {
-  processor: {
-    onEnd: (span: AutopilotSpan) => void;
-  };
-  debug: boolean;
-}
-
-let state: InstrumentationState | null = null;
-
-export function setInstrumentationState(s: InstrumentationState): void {
-  state = s;
-}
+import { getInstrumentationState } from './state.js';
 
 // ── Caller Location Extraction ───────────────────────────────────────────────
 
@@ -59,6 +48,7 @@ function extractToolInfo(options: Record<string, unknown>): {
 
 function wrapGenerateText(original: AnyFunction): AnyFunction {
   return async function wrappedGenerateText(...args: unknown[]) {
+    const state = getInstrumentationState();
     if (!state) return original(...args);
 
     const options = (args[0] ?? {}) as Record<string, unknown>;
@@ -151,7 +141,7 @@ function wrapGenerateText(original: AnyFunction): AnyFunction {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       span.setStatus(2, message);
-      state.processor.onEnd(span);
+      state!.processor.onEnd(span);
       throw err;
     }
   };
@@ -161,6 +151,7 @@ function wrapGenerateText(original: AnyFunction): AnyFunction {
 
 function wrapStreamText(original: AnyFunction): AnyFunction {
   return function wrappedStreamText(...args: unknown[]) {
+    const state = getInstrumentationState();
     if (!state) return original(...args);
 
     const options = (args[0] ?? {}) as Record<string, unknown>;
@@ -230,6 +221,7 @@ function wrapStreamText(original: AnyFunction): AnyFunction {
 
 function wrapGenerateObject(original: AnyFunction): AnyFunction {
   return async function wrappedGenerateObject(...args: unknown[]) {
+    const state = getInstrumentationState();
     if (!state) return original(...args);
 
     const options = (args[0] ?? {}) as Record<string, unknown>;
@@ -281,7 +273,7 @@ function wrapGenerateObject(original: AnyFunction): AnyFunction {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       span.setStatus(2, message);
-      state.processor.onEnd(span);
+      state!.processor.onEnd(span);
       throw err;
     }
   };
@@ -295,6 +287,7 @@ let instrumented = false;
 
 export function instrumentVercelAI(): void {
   if (instrumented) return;
+  const state = getInstrumentationState();
   if (!state) {
     console.warn('[llm-autopilot] Call initAutopilot() before instrumentVercelAI()');
     return;
@@ -306,27 +299,46 @@ export function instrumentVercelAI(): void {
 
     if (typeof aiModule.generateText === 'function') {
       const original = aiModule.generateText;
-      aiModule.generateText = wrapGenerateText(original) as typeof aiModule.generateText;
+      Object.defineProperty(aiModule, 'generateText', {
+        value: wrapGenerateText(original) as typeof aiModule.generateText,
+        writable: true,
+        configurable: true
+      });
     }
 
     if (typeof aiModule.streamText === 'function') {
       const original = aiModule.streamText;
-      aiModule.streamText = wrapStreamText(original) as typeof aiModule.streamText;
+      Object.defineProperty(aiModule, 'streamText', {
+        value: wrapStreamText(original) as typeof aiModule.streamText,
+        writable: true,
+        configurable: true
+      });
     }
 
     if (typeof aiModule.generateObject === 'function') {
       const original = aiModule.generateObject;
-      aiModule.generateObject = wrapGenerateObject(original) as typeof aiModule.generateObject;
+      Object.defineProperty(aiModule, 'generateObject', {
+        value: wrapGenerateObject(original) as typeof aiModule.generateObject,
+        writable: true,
+        configurable: true
+      });
     }
 
     instrumented = true;
 
     if (state.debug) {
-      console.log('[llm-autopilot] Vercel AI SDK instrumented successfully');
+      console.log('[llm-autopilot] Vercel AI SDK instrumented successfully (CommonJS)');
     }
-  } catch (err) {
-    console.warn(
-      '[llm-autopilot] Could not instrument Vercel AI SDK. Error:', err
-    );
+  } catch (err: any) {
+    if (state?.debug) {
+      console.log(`[llm-autopilot] Auto-instrumentation bypassed (Native ESM detected): ${err.message}`);
+    }
   }
+}
+
+export function withAutopilot<T extends AnyFunction>(fn: T): T {
+  if (fn.name === 'generateText' || fn.name === 'wrappedGenerateText') return wrapGenerateText(fn) as unknown as T;
+  if (fn.name === 'streamText' || fn.name === 'wrappedStreamText') return wrapStreamText(fn) as unknown as T;
+  if (fn.name === 'generateObject' || fn.name === 'wrappedGenerateObject') return wrapGenerateObject(fn) as unknown as T;
+  return fn;
 }
