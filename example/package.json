@@ -1,0 +1,16 @@
+{
+  "name": "example-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/groq": "^3.0.42",
+    "@ai-sdk/openai": "^1.3.0",
+    "llm-lens-sdk": "*",
+    "ai": "^6.0.208",
+    "dotenv": "^16.4.5",
+    "tsx": "^4.16.2"
+  }
+}

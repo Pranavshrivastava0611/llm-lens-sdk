@@ -1,0 +1,44 @@
+{
+  "name": "llm-lens-daemon",
+  "version": "0.1.0",
+  "description": "LLM Autopilot daemon — receives spans, aggregates metrics, runs AI analysis",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "bin": {
+    "llm-lens": "./dist/cli.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc && rm -rf ui && cp -r ../dashboard/out ui",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist ui"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.85",
+    "@ai-sdk/groq": "^3.0.42",
+    "@ai-sdk/openai": "^3.0.74",
+    "ai": "^6.0.208",
+    "better-sqlite3": "^11.7.0",
+    "commander": "^13.1.0",
+    "express": "^5.2.1",
+    "ws": "^8.18.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.0",
+    "llm-lens-dashboard": "*",
+    "typescript": "^5.7.0"
+  },
+  "files": [
+    "dist",
+    "ui"
+  ],
+  "license": "MIT"
+}
