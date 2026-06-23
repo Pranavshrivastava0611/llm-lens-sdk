@@ -14,7 +14,7 @@ export async function runDeepAgenticAnalysis() {
     console.warn('[daemon] Cannot run deep analysis without API key');
     return null;
   }
-
+  
   // Set up model
   let model: any;
   if (config.provider === 'groq') {
