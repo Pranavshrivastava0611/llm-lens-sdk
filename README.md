@@ -47,19 +47,57 @@ In your local LLM project, install the SDK:
 npm install llm-lens-sdk
 ```
 
-Add the following two lines to the very top of your application entry file (e.g., `index.ts` or `server.ts`):
+LLM Lens provides explicit wrapper adapters for popular AI frameworks. First, initialize the telemetry exporter, then wrap your clients or functions:
 
+#### Vercel AI SDK
 ```typescript
-import { initAutopilot, instrumentVercelAI } from 'llm-lens-sdk';
+import { initAutopilot, wrapVercelAI } from 'llm-lens-sdk';
+import { generateText as _generateText, streamText as _streamText } from 'ai';
 
-// 1. Initialize the local telemetry exporter
-initAutopilot({ serviceName: 'my-ai-agent' });
+// 1. Initialize telemetry
+initAutopilot({ serviceName: 'my-vercel-ai-agent' });
 
-// 2. Instrument your AI framework (e.g., Vercel AI SDK)
-instrumentVercelAI();
+// 2. Wrap your functions
+const generateText = wrapVercelAI(_generateText);
+const streamText = wrapVercelAI(_streamText);
 
-// ... the rest of your app ...
-import { generateText } from 'ai';
+// ... use generateText and streamText as normal ...
+```
+
+#### OpenAI (and Groq)
+```typescript
+import { initAutopilot, wrapOpenAI, wrapGroq } from 'llm-lens-sdk';
+import OpenAI from 'openai';
+import Groq from 'groq-sdk';
+
+initAutopilot({ serviceName: 'my-openai-agent' });
+
+// Wrap the client instance
+const openai = wrapOpenAI(new OpenAI({ apiKey: '...' }));
+const groq = wrapGroq(new Groq({ apiKey: '...' }));
+
+// ... use openai.chat.completions.create as normal ...
+```
+
+#### LangChain & LlamaIndex
+```typescript
+import { initAutopilot, LangChainTracer, LlamaIndexTracer } from 'llm-lens-sdk';
+
+initAutopilot({ serviceName: 'my-agent' });
+
+// Pass the tracer as a callback handler in your framework
+const tracer = new LangChainTracer();
+```
+
+#### Express.js (HTTP Tracing)
+```typescript
+import { initAutopilot, expressAutopilot } from 'llm-lens-sdk';
+import express from 'express';
+
+initAutopilot({ serviceName: 'my-backend' });
+
+const app = express();
+app.use(expressAutopilot()); // Add the middleware
 ```
 
 That's it! Run your app. Your traces will instantly appear in the LLM Lens dashboard.
