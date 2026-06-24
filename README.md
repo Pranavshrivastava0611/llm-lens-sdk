@@ -47,21 +47,24 @@ In your local LLM project, install the SDK:
 npm install llm-lens-sdk
 ```
 
-LLM Lens provides explicit wrapper adapters for popular AI frameworks. First, initialize the telemetry exporter, then wrap your clients or functions:
+LLM Lens integrates seamlessly with popular AI frameworks. First, initialize the telemetry exporter:
 
-#### Vercel AI SDK
+#### Vercel AI SDK (Native OpenTelemetry)
+Vercel AI SDK works out-of-the-box using its built-in `experimental_telemetry` option. `initAutopilot` automatically registers a fast, lightweight OpenTelemetry provider.
+
 ```typescript
-import { initAutopilot, wrapVercelAI } from 'llm-lens-sdk';
-import { generateText as _generateText, streamText as _streamText } from 'ai';
+import { initAutopilot } from 'llm-lens-sdk';
+import { generateText } from 'ai';
 
-// 1. Initialize telemetry
+// 1. Initialize telemetry (registers global OTEL provider automatically)
 initAutopilot({ serviceName: 'my-vercel-ai-agent' });
 
-// 2. Wrap your functions
-const generateText = wrapVercelAI(_generateText);
-const streamText = wrapVercelAI(_streamText);
-
-// ... use generateText and streamText as normal ...
+// 2. Just use Vercel AI SDK natively with telemetry enabled!
+await generateText({
+  model,
+  prompt: 'Hello world',
+  experimental_telemetry: { isEnabled: true } // Vercel handles the rest!
+});
 ```
 
 #### OpenAI (and Groq)

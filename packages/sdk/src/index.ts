@@ -1,7 +1,7 @@
 import { SpanExporter } from './collector/exporter.js';
 import { AutopilotSpanProcessor, AutopilotSpan } from './collector/processor.js';
-import { setInstrumentationState } from './instrumentation/state.js';
-import { instrumentVercelAI } from './instrumentation/vercel.js';
+import { setInstrumentationState } from './adapters/state.js';
+import { instrumentVercelAI } from './adapters/vercel.js';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,6 +25,9 @@ let processor: AutopilotSpanProcessor | null = null;
 let initialized = false;
 
 // ── initAutopilot ────────────────────────────────────────────────────────────
+
+import { trace } from '@opentelemetry/api';
+import { AutopilotTracerProvider } from './otel/provider.js';
 
 export function initAutopilot(config: AutopilotConfig): void {
   if (initialized) {
@@ -53,6 +56,17 @@ export function initAutopilot(config: AutopilotConfig): void {
   });
 
   initialized = true;
+
+  try {
+    trace.setGlobalTracerProvider(new AutopilotTracerProvider());
+    if (config.debug) {
+      console.log('[llm-autopilot] Registered native OpenTelemetry TracerProvider');
+    }
+  } catch (err: any) {
+    if (config.debug) {
+      console.log(`[llm-autopilot] Failed to register OTEL provider: ${err.message}`);
+    }
+  }
 
   if (config.debug) {
     console.log(`[llm-autopilot] Initialized — service: ${config.serviceName}, daemon: ${daemonUrl}`);
@@ -83,8 +97,12 @@ export async function shutdown(): Promise<void> {
 
 // ── Re-exports ───────────────────────────────────────────────────────────────
 
-export { instrumentVercelAI, withAutopilot } from './instrumentation/vercel.js';
-export { observeOpenAI, observeGroq } from './instrumentation/openai.js';
-export { LLMLensCallbackHandler } from './instrumentation/langchain.js';
+export { instrumentVercelAI, wrapVercelAI } from './adapters/vercel.js';
+export { wrapOpenAI, wrapGroq } from './adapters/openai.js';
+export { wrapAnthropic } from './adapters/anthropic.js';
+export { wrapGemini } from './adapters/gemini.js';
+export { LangChainTracer } from './adapters/langchain.js';
+export { LlamaIndexTracer } from './adapters/llamaindex.js';
+export { expressAutopilot } from './adapters/express.js';
 export { AutopilotSpan } from './collector/processor.js';
 export type { QueuedSpan } from './queue/SpanQueue.js';

@@ -1,6 +1,6 @@
 import { AutopilotSpan } from '../collector/processor.js';
 
-type AnyFunction = (...args: unknown[]) => unknown;
+type AnyFunction = (...args: any[]) => any;
 
 import { getInstrumentationState } from './state.js';
 
@@ -108,7 +108,6 @@ function wrapGenerateText(original: AnyFunction): AnyFunction {
         // Track tool calls
         let totalToolCalls = 0;
         const calledTools: string[] = [];
-
         for (const step of steps) {
           const toolCalls = step.toolCalls as Array<{ toolName: string; args: unknown }> | undefined;
           if (toolCalls) {
@@ -117,15 +116,13 @@ function wrapGenerateText(original: AnyFunction): AnyFunction {
               calledTools.push(tc.toolName);
               span.addEvent('tool.called', {
                 toolName: tc.toolName,
-                args: JSON.stringify(tc.args).slice(0, 200),
+                args: (JSON.stringify(tc.args) ?? '').slice(0, 200),
               });
             }
           }
         }
-
         span.setAttribute('ai.toolCallCount', totalToolCalls);
         span.setAttribute('ai.toolCallNames', calledTools.join(','));
-
         // Check maxSteps reached
         if (toolInfo.maxSteps != null && steps.length >= toolInfo.maxSteps) {
           span.addEvent('maxSteps.reached', {
@@ -264,7 +261,7 @@ function wrapGenerateObject(original: AnyFunction): AnyFunction {
       // Capture object preview
       const object = result.object as unknown;
       if (object) {
-        span.setAttribute('ai.response.text', JSON.stringify(object).slice(0, 500));
+        span.setAttribute('ai.response.text', (JSON.stringify(object) ?? '').slice(0, 500));
       }
 
       span.setStatus(0);
@@ -336,7 +333,7 @@ export function instrumentVercelAI(): void {
   }
 }
 
-export function withAutopilot<T extends AnyFunction>(fn: T): T {
+export function wrapVercelAI<T extends AnyFunction>(fn: T): T {
   if (fn.name === 'generateText' || fn.name === 'wrappedGenerateText') return wrapGenerateText(fn) as unknown as T;
   if (fn.name === 'streamText' || fn.name === 'wrappedStreamText') return wrapStreamText(fn) as unknown as T;
   if (fn.name === 'generateObject' || fn.name === 'wrappedGenerateObject') return wrapGenerateObject(fn) as unknown as T;

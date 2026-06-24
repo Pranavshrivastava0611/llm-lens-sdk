@@ -1,7 +1,7 @@
 import { AutopilotSpan } from '../collector/processor.js';
 import { getInstrumentationState } from './state.js';
 
-export class LLMLensCallbackHandler {
+export class LangChainTracer {
   name = 'llm_lens_callback_handler';
   
   // Track active spans by LangChain runId
