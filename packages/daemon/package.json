@@ -1,7 +1,26 @@
 {
   "name": "llm-lens-daemon",
   "version": "0.1.0",
-  "description": "LLM Autopilot daemon — receives spans, aggregates metrics, runs AI analysis",
+  "description": "The background daemon and local SQLite dashboard for LLM Lens. Receives ultra-low latency OpenTelemetry spans.",
+  "author": "Pranav Shrivastava",
+  "keywords": [
+    "llm",
+    "observability",
+    "opentelemetry",
+    "daemon",
+    "sqlite",
+    "dashboard",
+    "tracing"
+  ],
+  "homepage": "https://github.com/Pranavshrivastava0611/llm-lens-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pranavshrivastava0611/llm-lens-sdk.git",
+    "directory": "packages/daemon"
+  },
+  "bugs": {
+    "url": "https://github.com/Pranavshrivastava0611/llm-lens-sdk/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",

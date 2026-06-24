@@ -1,7 +1,29 @@
 {
   "name": "llm-lens-sdk",
   "version": "0.1.0",
-  "description": "LLM observability SDK — capture spans from your AI application",
+  "description": "Sub-millisecond, local-first OpenTelemetry observability SDK for LLMs. Features native Vercel AI SDK integration.",
+  "author": "Pranav Shrivastava",
+  "keywords": [
+    "llm",
+    "observability",
+    "opentelemetry",
+    "ai",
+    "vercel",
+    "langchain",
+    "openai",
+    "telemetry",
+    "tracing",
+    "debugging"
+  ],
+  "homepage": "https://github.com/Pranavshrivastava0611/llm-lens-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pranavshrivastava0611/llm-lens-sdk.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/Pranavshrivastava0611/llm-lens-sdk/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
