@@ -1,6 +1,6 @@
 {
   "name": "llm-lens-sdk",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "Sub-millisecond, local-first OpenTelemetry observability SDK for LLMs. Features native Vercel AI SDK integration.",
   "author": "Pranav Shrivastava",
   "keywords": [
@@ -58,6 +58,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@opentelemetry/api": "^1.9.1"
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/context-async-hooks": "^2.8.0"
   }
 }

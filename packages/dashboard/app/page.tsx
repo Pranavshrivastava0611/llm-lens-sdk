@@ -71,7 +71,7 @@ export default function Dashboard() {
   const p95 = state.currentWindow?.p95LatencyMs ?? 0;
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#0a0a0a] pb-[60px] md:pb-0">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[var(--color-bg)] pb-[60px] md:pb-0">
       <Sidebar 
         activeTab={activeTab} 
         onSelectTab={setActiveTab} 
@@ -79,7 +79,7 @@ export default function Dashboard() {
       />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <SpanDetailModal span={selectedSpan} onClose={() => setSelectedSpan(null)} />
+        <SpanDetailModal span={selectedSpan} allSpans={state.spans} onClose={() => setSelectedSpan(null)} />
         
         {/* Fixed top area */}
         <div className="flex-none">
@@ -107,13 +107,13 @@ export default function Dashboard() {
           {/* SECTION: AI REPORTS */}
           {activeTab === 'insights' && (
             <div className="h-full flex flex-col md:flex-row gap-5">
-              <div className="flex-1 bg-[#0d0d0d] border border-[#222] rounded-lg p-5 overflow-auto custom-scrollbar">
-                <h2 className="text-xl font-bold mb-4">AI Insight Reports</h2>
+              <div className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-5 overflow-auto custom-scrollbar">
+                <h2 className="text-xl font-bold mb-4 text-[var(--color-content)]">AI Insight Reports</h2>
                 <InsightList insights={state.insights} windowEnd={windowEnd} />
               </div>
               <div className="w-full md:w-[400px] flex-shrink-0 flex flex-col gap-4">
-                <div className="flex-1 bg-[#0d0d0d] border border-[#222] rounded-lg p-5 overflow-auto custom-scrollbar">
-                  <h2 className="text-xl font-bold mb-4">Long-Term Memory</h2>
+                <div className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-5 overflow-auto custom-scrollbar">
+                  <h2 className="text-xl font-bold mb-4 text-[var(--color-content)]">Long-Term Memory</h2>
                   <MemoryPanel serviceName={state.spans[0]?.serviceName ?? 'default'} />
                 </div>
                 <div className="flex-none">
@@ -176,13 +176,13 @@ export default function Dashboard() {
                   <div className="flex gap-2 mb-1">
                     <button 
                       onClick={() => setRightTab('insights')}
-                      className={`px-3 py-1 text-[11px] font-bold rounded-md transition-colors ${rightTab === 'insights' ? 'bg-[#333] text-white' : 'text-[#666] hover:text-[#ccc]'}`}
+                      className={`px-3 py-1.5 text-[11px] font-bold rounded-md transition-colors ${rightTab === 'insights' ? 'bg-[var(--color-hover)] text-[var(--color-content)] shadow-sm' : 'text-[var(--color-muted)] hover:text-[var(--color-content)] hover:bg-[var(--color-surface)]'}`}
                     >
                       AI INSIGHTS
                     </button>
                     <button 
                       onClick={() => setRightTab('memory')}
-                      className={`px-3 py-1 text-[11px] font-bold rounded-md transition-colors ${rightTab === 'memory' ? 'bg-[#333] text-white' : 'text-[#666] hover:text-[#ccc]'}`}
+                      className={`px-3 py-1.5 text-[11px] font-bold rounded-md transition-colors ${rightTab === 'memory' ? 'bg-[var(--color-hover)] text-[var(--color-content)] shadow-sm' : 'text-[var(--color-muted)] hover:text-[var(--color-content)] hover:bg-[var(--color-surface)]'}`}
                     >
                       LONG-TERM MEMORY
                     </button>

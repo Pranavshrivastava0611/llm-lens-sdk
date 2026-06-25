@@ -59,30 +59,29 @@ export default function LatencyChart({ completedTraces, p50, p95 }: LatencyChart
 
   return (
     <div
-      className="rounded-lg p-3 flex flex-col"
-      style={{ background: "#111", border: "1px solid #1a1a1a", height: 160 }}
+      className="rounded-lg p-3 flex flex-col bg-[var(--color-surface)] border border-[var(--color-border)] h-[160px]"
     >
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] tracking-widest" style={{ color: "#555" }}>
-          LATENCY (p50 / p95)
+        <span className="text-[10px] tracking-widest text-[var(--color-muted)] font-semibold">
+          LATENCY DISTRIBUTION
         </span>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
-            <div className="w-2 h-0.5 rounded" style={{ background: "#a78bfa" }} />
-            <span className="text-[9px]" style={{ color: "#666" }}>p50 {Math.round(p50)}ms</span>
+            <div className="w-2 h-2 rounded bg-[var(--color-purple)] opacity-70"></div>
+            <span className="text-[9px] text-[var(--color-dim)] font-mono">P50: {Math.round(p50)}ms</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2 h-0.5 rounded" style={{ background: "#f97316" }} />
-            <span className="text-[9px]" style={{ color: "#666" }}>p95 {Math.round(p95)}ms</span>
+            <div className="w-2 h-2 rounded bg-[var(--color-purple)] opacity-30"></div>
+            <span className="text-[9px] text-[var(--color-dim)] font-mono">P95: {Math.round(p95)}ms</span>
           </div>
         </div>
       </div>
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="flex-1 w-full">
-        {/* Y axis */}
-        <text x={PADDING.left - 4} y={PADDING.top + 4} textAnchor="end" fill="#444" fontSize="3.5">
+        {/* Y axis labels */}
+        <text x={PADDING.left - 4} y={PADDING.top + 4} textAnchor="end" fill="var(--color-muted)" fontSize="3.5">
           {data.maxMs >= 1000 ? `${(data.maxMs / 1000).toFixed(1)}s` : `${Math.round(data.maxMs)}ms`}
         </text>
-        <text x={PADDING.left - 4} y={PADDING.top + plotH} textAnchor="end" fill="#444" fontSize="3.5">
+        <text x={PADDING.left - 4} y={PADDING.top + plotH} textAnchor="end" fill="var(--color-muted)" fontSize="3.5">
           0
         </text>
 
@@ -94,19 +93,19 @@ export default function LatencyChart({ completedTraces, p50, p95 }: LatencyChart
             y1={PADDING.top + plotH * (1 - pct)}
             x2={PADDING.left + plotW}
             y2={PADDING.top + plotH * (1 - pct)}
-            stroke="#1a1a1a"
+            stroke="var(--color-border-light)"
             strokeWidth="0.3"
           />
         ))}
 
         {/* Fill between p50 and p95 */}
-        {data.fillPath && <path d={data.fillPath} fill="rgba(249,115,22,0.08)" />}
+        {data.fillPath && <path d={data.fillPath} fill="var(--color-orange)" opacity={0.15} />}
 
         {/* p50 line */}
-        {data.p50Line && <path d={data.p50Line} fill="none" stroke="#a78bfa" strokeWidth="0.8" />}
+        {data.p50Line && <path d={data.p50Line} fill="none" stroke="var(--color-purple)" strokeWidth="0.8" />}
 
         {/* p95 line */}
-        {data.p95Line && <path d={data.p95Line} fill="none" stroke="#f97316" strokeWidth="0.8" />}
+        {data.p95Line && <path d={data.p95Line} fill="none" stroke="var(--color-orange)" strokeWidth="0.8" />}
 
         {/* X axis labels */}
         {xLabels.map((label, i) => (
@@ -115,7 +114,7 @@ export default function LatencyChart({ completedTraces, p50, p95 }: LatencyChart
             x={PADDING.left + (i / (xLabels.length - 1)) * plotW}
             y={HEIGHT - 4}
             textAnchor="middle"
-            fill="#444"
+            fill="var(--color-dim)"
             fontSize="3"
           >
             {label}

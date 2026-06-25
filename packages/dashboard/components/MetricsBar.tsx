@@ -16,56 +16,79 @@ interface MetricCard {
 }
 
 export default function MetricsBar({ currentWindow, completedTraces, patternAlerts }: MetricsBarProps) {
-  const w = currentWindow;
-  const traceCount = w?.totalTraces ?? completedTraces.length;
-  const errorRate = w?.errorRate ?? (completedTraces.length > 0
-    ? completedTraces.filter(t => t.hasError).length / completedTraces.length : 0);
-  const avgLatency = w?.avgLatencyMs ?? (completedTraces.length > 0
-    ? completedTraces.reduce((a, t) => a + t.durationMs, 0) / completedTraces.length : 0);
-  const p95 = w?.p95LatencyMs ?? 0;
-  const totalTokens = w?.totalTokens ?? completedTraces.reduce((a, t) => a + t.totalTokens, 0);
-  const avgTokens = traceCount > 0 ? totalTokens / traceCount : 0;
-  const toolCalls = w?.totalToolCalls ?? 0;
-  const patternCount = patternAlerts.length;
-  const tokenTrend = w?.tokenTrend ?? "stable";
+  // Global Metrics
+  const globalTraces = completedTraces.length;
+  const globalErrorRate = globalTraces > 0 ? completedTraces.filter(t => t.hasError).length / globalTraces : 0;
+  const globalAvgLatency = globalTraces > 0 ? completedTraces.reduce((a, t) => a + t.durationMs, 0) / globalTraces : 0;
+  const globalTokens = completedTraces.reduce((a, t) => a + t.totalTokens, 0);
 
-  const errorColor = errorRate > 0.15 ? "#ef4444" : errorRate > 0.05 ? "#f97316" : "#4ade80";
-  const tokenColor = tokenTrend === "spiking" ? "#ef4444" : tokenTrend === "rising" ? "#f97316" : "#60a5fa";
+  const globalErrorColor = globalErrorRate > 0.15 ? "#ef4444" : globalErrorRate > 0.05 ? "#f97316" : "#4ade80";
+
+  // Window Metrics
+  const w = currentWindow;
+  const winTraces = w?.totalTraces ?? 0;
+  const winErrorRate = w?.errorRate ?? 0;
+  const winAvgLatency = w?.avgLatencyMs ?? 0;
+  const winP95 = w?.p95LatencyMs ?? 0;
+  const winTokens = w?.totalTokens ?? 0;
+  const winToolCalls = w?.totalToolCalls ?? 0;
+  const winTokenTrend = w?.tokenTrend ?? "stable";
+  const patternCount = patternAlerts.length;
+
+  const winErrorColor = winErrorRate > 0.15 ? "#ef4444" : winErrorRate > 0.05 ? "#f97316" : "#4ade80";
+  const tokenColor = winTokenTrend === "spiking" ? "#ef4444" : winTokenTrend === "rising" ? "#f97316" : "#60a5fa";
   const hasCritical = patternAlerts.some(a => a.severity === "critical");
 
-  const cards: MetricCard[] = [
-    { label: "TRACES", value: traceCount.toLocaleString(), color: "#ffffff" },
-    { label: "ERROR RATE", value: traceCount > 0 ? `${(errorRate * 100).toFixed(1)}%` : "—", color: traceCount > 0 ? errorColor : "#555" },
-    { label: "AVG LATENCY", value: traceCount > 0 ? `${Math.round(avgLatency).toLocaleString()}ms` : "—", color: traceCount > 0 ? "#a78bfa" : "#555" },
-    { label: "P95 LATENCY", value: traceCount > 0 ? `${Math.round(p95).toLocaleString()}ms` : "—", color: traceCount > 0 ? "#a78bfa" : "#555" },
-    { label: "TOTAL TOKENS", value: traceCount > 0 ? totalTokens.toLocaleString() : "—", color: traceCount > 0 ? "#60a5fa" : "#555" },
-    { label: "AVG TOKENS / TRACE", value: traceCount > 0 ? Math.round(avgTokens).toLocaleString() : "—", color: traceCount > 0 ? tokenColor : "#555" },
-    { label: "TOOL CALLS", value: traceCount > 0 ? toolCalls.toLocaleString() : "—", color: traceCount > 0 ? "#34d399" : "#555" },
-    { label: "PATTERNS", value: traceCount > 0 ? String(patternCount) : "—", color: traceCount > 0 && patternCount > 0 ? "#f59e0b" : "#555", blink: hasCritical },
+  const globalCards: MetricCard[] = [
+    { label: "TRACES (24H)", value: globalTraces.toLocaleString(), color: "var(--color-content)" },
+    { label: "ERROR RATE (24H)", value: globalTraces > 0 ? `${(globalErrorRate * 100).toFixed(1)}%` : "—", color: globalTraces > 0 ? globalErrorColor : "var(--color-dim)" },
+    { label: "AVG LATENCY (24H)", value: globalTraces > 0 ? `${Math.round(globalAvgLatency).toLocaleString()}ms` : "—", color: globalTraces > 0 ? "var(--color-purple)" : "var(--color-dim)" },
+    { label: "TOKENS (24H)", value: globalTraces > 0 ? globalTokens.toLocaleString() : "—", color: globalTraces > 0 ? "var(--color-blue)" : "var(--color-dim)" },
   ];
+
+  const windowCards: MetricCard[] = [
+    { label: "TRACES (LIVE)", value: winTraces.toLocaleString(), color: "var(--color-content)" },
+    { label: "ERROR RATE (LIVE)", value: w ? `${(winErrorRate * 100).toFixed(1)}%` : "—", color: w ? winErrorColor : "var(--color-dim)" },
+    { label: "AVG LATENCY (LIVE)", value: w ? `${Math.round(winAvgLatency).toLocaleString()}ms` : "—", color: w ? "var(--color-purple)" : "var(--color-dim)" },
+    { label: "TOKENS (LIVE)", value: w ? winTokens.toLocaleString() : "—", color: w ? tokenColor : "var(--color-dim)" },
+    { label: "TOOL CALLS (LIVE)", value: winTraces > 0 ? winToolCalls.toLocaleString() : "—", color: winTraces > 0 ? "#34d399" : "var(--color-dim)" },
+    { label: "PATTERNS (LIVE)", value: patternCount > 0 ? String(patternCount) : "—", color: patternCount > 0 ? "#f59e0b" : "var(--color-dim)", blink: hasCritical },
+  ];
+
+  const renderCard = (card: MetricCard, i: number) => (
+    <div
+      key={i}
+      className={`flex flex-col p-3 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm ${card.blink ? "animate-pulse-border" : ""}`}
+    >
+      <span className="text-[10px] font-semibold tracking-wider text-[var(--color-muted)] mb-1">
+        {card.label}
+      </span>
+      <span
+        className="text-lg font-bold leading-none font-mono"
+        style={{ color: card.color }}
+      >
+        {card.value}
+      </span>
+    </div>
+  );
 
   return (
     <div
       id="metrics-bar"
-      className="flex items-center overflow-x-auto"
-      style={{ height: 56, background: "#0d0d0d", borderBottom: "1px solid #1a1a1a", padding: "0 24px" }}
+      className="flex flex-col md:flex-row items-start md:items-center overflow-x-auto overflow-y-hidden bg-zinc-950 border-b border-zinc-800 min-h-[64px] py-2 px-6"
     >
-      {cards.map((card, i) => (
-        <div key={card.label} className="flex items-center">
-          {i > 0 && <div style={{ width: 1, height: 32, background: "#1a1a1a", flexShrink: 0 }} />}
-          <div className="flex flex-col items-center justify-center px-5 min-w-[120px]">
-            <span
-              className={`text-lg font-semibold leading-none font-mono ${card.blink ? "animate-blink" : ""}`}
-              style={{ color: card.color }}
-            >
-              {card.value}
-            </span>
-            <span className="text-[9px] mt-1 tracking-widest" style={{ color: "#555" }}>
-              {card.label}
-            </span>
-          </div>
-        </div>
-      ))}
+      <div className="flex items-center">
+        {globalCards.map(renderCard)}
+      </div>
+      
+      {/* Separator between Global and Live */}
+      <div className="hidden md:flex flex-col justify-center px-4">
+        <div className="w-0.5 h-10 bg-zinc-800 rounded-sm" />
+      </div>
+
+      <div className="flex items-center mt-2 md:mt-0">
+        {windowCards.map(renderCard)}
+      </div>
     </div>
   );
 }

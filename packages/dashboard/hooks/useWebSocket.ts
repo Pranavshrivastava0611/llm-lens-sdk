@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 export interface SpanEvent {
+  id?: string;
+  parentSpanId?: string;
   name: string;
   traceId: string;
   status: { code: number; message?: string };

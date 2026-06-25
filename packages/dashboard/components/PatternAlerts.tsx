@@ -29,7 +29,7 @@ export default function PatternAlerts({ alerts }: PatternAlertsProps) {
   return (
     <div className="mb-3">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[10px] tracking-[2px]" style={{ color: "#444" }}>
+        <span className="text-[10px] tracking-[2px] text-[var(--color-dim)] font-semibold">
           PATTERN ALERTS
         </span>
         {alerts.length > 0 && (
@@ -46,7 +46,7 @@ export default function PatternAlerts({ alerts }: PatternAlertsProps) {
       </div>
 
       {alerts.length === 0 ? (
-        <div className="text-xs py-3 text-center" style={{ color: "#333" }}>
+        <div className="text-xs py-3 text-center text-[var(--color-dim)]">
           ✓ No patterns detected this window
         </div>
       ) : (
@@ -69,9 +69,9 @@ export default function PatternAlerts({ alerts }: PatternAlertsProps) {
               >
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="text-sm">{PATTERN_ICONS[alert.type] ?? "⚠️"}</span>
-                  <span className="text-[11px] font-medium text-white truncate">{alert.title}</span>
+                  <span className="text-[11px] font-medium text-[var(--color-content)] truncate">{alert.title}</span>
                 </div>
-                <div className="text-[10px] mb-1.5 truncate" style={{ color: "#999" }}>
+                <div className="text-[10px] mb-1.5 truncate text-[var(--color-muted)]">
                   {alert.description.slice(0, 60)}
                   {alert.description.length > 60 ? "…" : ""}
                 </div>

@@ -19,10 +19,10 @@ export default function InsightList({ insights, windowEnd }: InsightListProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] tracking-[2px]" style={{ color: "#444" }}>
+        <span className="text-[10px] tracking-[2px] text-[var(--color-dim)] font-semibold">
           AI INSIGHTS
         </span>
-        <span className="text-[9px]" style={{ color: "#333" }}>
+        <span className="text-[9px] text-[var(--color-muted)]">
           Updates every 15 min
         </span>
       </div>
@@ -55,16 +55,15 @@ export default function InsightList({ insights, windowEnd }: InsightListProps) {
             return (
               <div
                 key={i}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-md cursor-pointer hover:opacity-80 transition-opacity"
-                style={{ background: "#0d0d0d", border: "1px solid #1a1a1a" }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-md cursor-pointer hover:bg-[var(--color-hover)] transition-all bg-[var(--color-surface)] border border-[var(--color-border)]"
               >
                 <span className="text-xs font-bold" style={{ color: scoreColor }}>
                   {insight.healthScore}
                 </span>
-                <span className="flex-1 text-[11px] truncate" style={{ color: "#999" }}>
+                <span className="flex-1 text-[11px] truncate text-[var(--color-muted)] font-medium">
                   {insight.headline}
                 </span>
-                <span className="text-[9px] flex-shrink-0" style={{ color: "#444" }} suppressHydrationWarning>
+                <span className="text-[9px] flex-shrink-0 text-[var(--color-dim)]" suppressHydrationWarning>
                   {new Date(insight.windowEnd).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
@@ -85,24 +84,21 @@ function NoInsightsYet({ windowEnd }: { windowEnd: number }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] tracking-[2px]" style={{ color: "#444" }}>
+        <span className="text-[10px] tracking-[2px] text-[var(--color-dim)] font-semibold">
           AI INSIGHTS
         </span>
       </div>
-      <div className="rounded-lg p-6 text-center" style={{ background: "#111", border: "1px solid #1a1a1a" }}>
-        <div className="text-sm mb-2" style={{ color: "#555" }}>
+      <div className="rounded-lg p-6 text-center bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm">
+        <div className="text-sm mb-2 text-[var(--color-content)] font-medium">
           First analysis in progress...
         </div>
-        <div className="text-xs mb-3" style={{ color: "#333" }}>
+        <div className="text-xs mb-3 text-[var(--color-muted)]">
           Window {Math.round(pct)}% complete
         </div>
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#1a1a1a" }}>
+        <div className="h-1.5 rounded-full overflow-hidden bg-[var(--color-panel)] border border-[var(--color-border)]">
           <div
-            className="h-full rounded-full transition-all duration-1000"
-            style={{
-              width: `${pct}%`,
-              background: "linear-gradient(90deg, #3b82f6, #8b5cf6)",
-            }}
+            className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-blue-500 to-purple-500"
+            style={{ width: `${pct}%` }}
           />
         </div>
       </div>

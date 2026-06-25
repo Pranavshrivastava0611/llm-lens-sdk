@@ -26,7 +26,8 @@ let initialized = false;
 
 // ── initAutopilot ────────────────────────────────────────────────────────────
 
-import { trace } from '@opentelemetry/api';
+import { trace, context } from '@opentelemetry/api';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { AutopilotTracerProvider } from './otel/provider.js';
 
 export function initAutopilot(config: AutopilotConfig): void {
@@ -58,6 +59,9 @@ export function initAutopilot(config: AutopilotConfig): void {
   initialized = true;
 
   try {
+    const contextManager = new AsyncLocalStorageContextManager();
+    contextManager.enable();
+    context.setGlobalContextManager(contextManager);
     trace.setGlobalTracerProvider(new AutopilotTracerProvider());
     if (config.debug) {
       console.log('[llm-autopilot] Registered native OpenTelemetry TracerProvider');

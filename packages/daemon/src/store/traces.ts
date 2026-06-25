@@ -170,6 +170,8 @@ export function getRecentRawSpans(limit: number = 100): Array<any> {
       const parsedSpans = JSON.parse(row.spans);
       for (const span of parsedSpans) {
         recentSpans.push({
+          id: span.id,
+          parentSpanId: span.parentSpanId,
           name: span.name,
           traceId: span.traceId,
           serviceName: row.serviceName,

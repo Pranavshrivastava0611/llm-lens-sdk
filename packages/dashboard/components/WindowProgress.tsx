@@ -39,13 +39,13 @@ export default function WindowProgress({
 
   if (!mounted) {
     return (
-      <div className="rounded-lg p-3" style={{ background: "#111", border: "1px solid #1a1a1a", height: 210 }}>
+      <div className="rounded-lg p-3 bg-[var(--color-surface)] border border-[var(--color-border)] h-[210px]">
         <div className="animate-pulse flex space-x-4">
           <div className="flex-1 space-y-4 py-1">
-            <div className="h-2 bg-[#222] rounded"></div>
+            <div className="h-2 bg-[var(--color-border)] rounded"></div>
             <div className="space-y-3">
-              <div className="h-2 bg-[#222] rounded"></div>
-              <div className="h-2 bg-[#222] rounded"></div>
+              <div className="h-2 bg-[var(--color-border)] rounded"></div>
+              <div className="h-2 bg-[var(--color-border)] rounded"></div>
             </div>
           </div>
         </div>
@@ -63,18 +63,18 @@ export default function WindowProgress({
   const endTime = new Date(windowEnd).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <div className="rounded-lg p-3" style={{ background: "#111", border: "1px solid #1a1a1a" }}>
+    <div className="rounded-lg p-3 bg-[var(--color-surface)] border border-[var(--color-border)]">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] tracking-[2px]" style={{ color: "#444" }}>
+        <span className="text-[10px] tracking-[2px] text-[var(--color-dim)] font-semibold">
           CURRENT WINDOW
         </span>
-        <span className="text-[10px]" style={{ color: "#555" }}>
+        <span className="text-[10px] text-[var(--color-muted)]">
           {startTime} – {endTime}
         </span>
       </div>
 
       {/* Progress bar */}
-      <div className="h-2 rounded-full overflow-hidden mb-2" style={{ background: "#1a1a1a" }}>
+      <div className="h-2 rounded-full overflow-hidden mb-2 bg-[var(--color-panel)] border border-[var(--color-border)]">
         <div
           className="h-full rounded-full transition-all duration-1000 ease-linear"
           style={{
@@ -85,28 +85,27 @@ export default function WindowProgress({
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px]" style={{ color: "#555" }}>
+        <span className="text-[10px] text-[var(--color-muted)]">
           {Math.round(pct)}% complete
         </span>
-        <span className="text-[11px] font-mono" style={{ color: "#888" }}>
+        <span className="text-[11px] font-mono text-[var(--color-dim)]">
           Closes in: {remaining}
         </span>
       </div>
 
       {/* 2x2 stats grid */}
       <div className="grid grid-cols-2 gap-2 mb-2">
-        <StatCell label="Traces" value={traces.toLocaleString()} color="#fff" />
-        <StatCell label="Tokens" value={tokens.toLocaleString()} color="#60a5fa" />
-        <StatCell label="Errors" value={String(errors)} color={errors > 0 ? "#ef4444" : "#4ade80"} />
-        <StatCell label="Patterns" value={String(patterns)} color={patterns > 0 ? "#f59e0b" : "#555"} />
+        <StatCell label="Traces" value={traces.toLocaleString()} color="var(--color-content)" />
+        <StatCell label="Tokens" value={tokens.toLocaleString()} color="var(--color-blue)" />
+        <StatCell label="Errors" value={String(errors)} color={errors > 0 ? "var(--color-red)" : "var(--color-green)"} />
+        <StatCell label="Patterns" value={String(patterns)} color={patterns > 0 ? "var(--color-yellow)" : "var(--color-dim)"} />
       </div>
 
       <div className="flex flex-col gap-1.5 mt-2">
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('forceAnalysis'))}
           disabled={isGenerating}
-          className={`w-full py-1.5 rounded-md text-[11px] font-semibold tracking-wide transition-opacity ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}`}
-          style={{ background: "#222", color: "#ccc", border: "1px solid #333" }}
+          className={`w-full py-1.5 rounded-md text-[11px] font-semibold tracking-wide transition-all bg-[var(--color-panel)] border border-[var(--color-border)] text-[var(--color-content)] ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80 hover:bg-[var(--color-hover)]'}`}
         >
           {isGenerating ? "ANALYZING..." : "QUICK ANALYSIS"}
         </button>
@@ -125,8 +124,8 @@ export default function WindowProgress({
 
 function StatCell({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="rounded-md px-2.5 py-1.5" style={{ background: "#0d0d0d" }}>
-      <div className="text-[9px] tracking-wider" style={{ color: "#555" }}>{label}</div>
+    <div className="rounded-md px-2.5 py-1.5 bg-[var(--color-panel)] border border-[var(--color-border)] shadow-sm">
+      <div className="text-[9px] tracking-wider text-[var(--color-muted)]">{label}</div>
       <div className="text-sm font-semibold font-mono" style={{ color }}>{value}</div>
     </div>
   );

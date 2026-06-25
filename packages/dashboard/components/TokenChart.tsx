@@ -63,18 +63,17 @@ export default function TokenChart({ completedTraces }: TokenChartProps) {
 
   return (
     <div
-      className="rounded-lg p-3 flex flex-col"
-      style={{ background: "#111", border: "1px solid #1a1a1a", height: 160 }}
+      className="rounded-lg p-3 flex flex-col bg-[var(--color-surface)] border border-[var(--color-border)] h-[160px]"
     >
-      <span className="text-[10px] tracking-widest mb-1" style={{ color: "#555" }}>
+      <span className="text-[10px] tracking-widest mb-1 text-[var(--color-muted)] font-semibold">
         TOKEN USAGE
       </span>
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="flex-1 w-full">
         {/* Y axis labels */}
-        <text x={PADDING.left - 4} y={PADDING.top + 4} textAnchor="end" fill="#444" fontSize="3.5">
+        <text x={PADDING.left - 4} y={PADDING.top + 4} textAnchor="end" fill="var(--color-muted)" fontSize="3.5">
           {maxTokens >= 1000 ? `${(maxTokens / 1000).toFixed(0)}k` : maxTokens}
         </text>
-        <text x={PADDING.left - 4} y={PADDING.top + plotH} textAnchor="end" fill="#444" fontSize="3.5">
+        <text x={PADDING.left - 4} y={PADDING.top + plotH} textAnchor="end" fill="var(--color-muted)" fontSize="3.5">
           0
         </text>
 
@@ -86,7 +85,7 @@ export default function TokenChart({ completedTraces }: TokenChartProps) {
             y1={PADDING.top + plotH * (1 - pct)}
             x2={PADDING.left + plotW}
             y2={PADDING.top + plotH * (1 - pct)}
-            stroke="#1a1a1a"
+            stroke="var(--color-border-light)"
             strokeWidth="0.3"
           />
         ))}
@@ -99,7 +98,7 @@ export default function TokenChart({ completedTraces }: TokenChartProps) {
             y1={PADDING.top}
             x2={PADDING.left + plotW * pct}
             y2={PADDING.top + plotH}
-            stroke="#333"
+            stroke="var(--color-border)"
             strokeWidth="0.3"
             strokeDasharray="1.5,1.5"
           />
@@ -133,7 +132,7 @@ export default function TokenChart({ completedTraces }: TokenChartProps) {
             x={PADDING.left + (i / (xLabels.length - 1)) * plotW}
             y={HEIGHT - 4}
             textAnchor="middle"
-            fill="#444"
+            fill="var(--color-dim)"
             fontSize="3"
           >
             {label}

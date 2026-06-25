@@ -20,11 +20,9 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="antialiased"
+        className="antialiased bg-[var(--color-bg)] text-[var(--color-content)]"
         style={{
           fontFamily: "'Inter', system-ui, sans-serif",
-          backgroundColor: "#0a0a0a",
-          color: "#e5e5e5",
           margin: 0,
         }}
       >

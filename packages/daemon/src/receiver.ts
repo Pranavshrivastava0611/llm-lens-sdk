@@ -232,6 +232,8 @@ export class SpanReceiver extends EventEmitter {
 
     for (const span of spans) {
       const spanData = {
+        id: span.id,
+        parentSpanId: span.parentSpanId,
         name: span.name,
         traceId: span.traceId,
         serviceName: metadata.serviceName,

@@ -5,7 +5,7 @@ import { AggregationWindowManager } from './aggregator/window.js';
 import { extractMetrics, type CompletedTrace } from './aggregator/metrics.js';
 import { detectTracePatterns } from './aggregator/patterns.js';
 import { analyzeWindow } from './agent/analyzer.js';
-import { setConfig, getPublicConfig } from './agent/config.js';
+import { setConfig, getPublicConfig, getConfig } from './agent/config.js';
 import { getDb, cleanupOldData } from './store/traces.js';
 import { MemoryStore } from './memory/store.js';
 import { BundleManager } from './memory/bundle.js';
@@ -136,59 +136,59 @@ export function startDaemon(options: DaemonOptions): { close: () => void } {
         return;
       }
 
-      if (req.method === 'GET' && req.url.startsWith('/report/download/')) {
-        const windowIdStr = req.url.split('/')[3];
-        if (!windowIdStr) {
-          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          res.end(JSON.stringify({ error: 'Missing windowId' }));
-          return;
-        }
+      res.writeHead(404, { 'Access-Control-Allow-Origin': '*' });
+      res.end();
+      return;
+    }
 
-        const windowId = parseInt(windowIdStr, 10);
-        
-        try {
-          const winRow = database.prepare('SELECT data, patternAlerts FROM aggregated_windows WHERE id = ?').get(windowId) as any;
-          const insRow = database.prepare('SELECT healthScore, headline, summary, findings, tokenAnalysis, latencyAnalysis, toolAnalysis, watchFor FROM insight_reports WHERE windowId = ?').get(windowId) as any;
-
-          if (!winRow || !insRow) {
-            res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-            res.end(JSON.stringify({ error: 'Report not found' }));
-            return;
-          }
-
-          const windowData = JSON.parse(winRow.data);
-          const alerts = JSON.parse(winRow.patternAlerts);
-          const insight = {
-            healthScore: insRow.healthScore,
-            headline: insRow.headline,
-            summary: insRow.summary,
-            findings: JSON.parse(insRow.findings),
-            tokenAnalysis: JSON.parse(insRow.tokenAnalysis),
-            latencyAnalysis: JSON.parse(insRow.latencyAnalysis),
-            toolAnalysis: JSON.parse(insRow.toolAnalysis),
-            watchFor: JSON.parse(insRow.watchFor),
-          };
-
-          import('./agent/report.js').then(({ generateMarkdownReport }) => {
-            const md = generateMarkdownReport(windowData, alerts, insight as any);
-            res.setHeader('Content-Type', 'text/markdown');
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Content-Disposition', `attachment; filename="llm-autopilot-report-${windowId}.md"`);
-            res.writeHead(200);
-            res.end(md);
-          }).catch(err => {
-            res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-            res.end(JSON.stringify({ error: err.message }));
-          });
-        } catch (err: any) {
-          res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          res.end(JSON.stringify({ error: err.message }));
-        }
+    if (req.method === 'GET' && req.url?.startsWith('/report/download/')) {
+      const windowIdStr = req.url.split('/')[3];
+      if (!windowIdStr) {
+        res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ error: 'Missing windowId' }));
         return;
       }
 
-      res.writeHead(404, { 'Access-Control-Allow-Origin': '*' });
-      res.end();
+      const windowId = parseInt(windowIdStr, 10);
+      
+      try {
+        const winRow = database.prepare('SELECT data, patternAlerts FROM aggregated_windows WHERE id = ?').get(windowId) as any;
+        const insRow = database.prepare('SELECT healthScore, headline, summary, findings, tokenAnalysis, latencyAnalysis, toolAnalysis, watchFor FROM insight_reports WHERE windowId = ?').get(windowId) as any;
+
+        if (!winRow || !insRow) {
+          res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          res.end(JSON.stringify({ error: 'Report not found' }));
+          return;
+        }
+
+        const windowData = JSON.parse(winRow.data);
+        const alerts = JSON.parse(winRow.patternAlerts);
+        const insight = {
+          healthScore: insRow.healthScore,
+          headline: insRow.headline,
+          summary: insRow.summary,
+          findings: JSON.parse(insRow.findings),
+          tokenAnalysis: JSON.parse(insRow.tokenAnalysis),
+          latencyAnalysis: JSON.parse(insRow.latencyAnalysis),
+          toolAnalysis: JSON.parse(insRow.toolAnalysis),
+          watchFor: JSON.parse(insRow.watchFor),
+        };
+
+        import('./agent/report.js').then(({ generateMarkdownReport }) => {
+          const md = generateMarkdownReport(windowData, alerts, insight as any);
+          res.setHeader('Content-Type', 'text/markdown');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Content-Disposition', `attachment; filename="llm-autopilot-report-${windowId}.md"`);
+          res.writeHead(200);
+          res.end(md);
+        }).catch(err => {
+          res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          res.end(JSON.stringify({ error: err.message }));
+        });
+      } catch (err: any) {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
       return;
     }
 
@@ -247,7 +247,14 @@ export function startDaemon(options: DaemonOptions): { close: () => void } {
   });
 
   receiver.on('config:update', (config: { provider: string; model: string }) => {
-    wsServer.broadcastConfigUpdated(config);
+    // If receiver somehow gets a config update, broadcast it with full current keys
+    const fullConfig = getConfig();
+    wsServer.broadcastConfigUpdated({
+      provider: config.provider,
+      model: config.model,
+      hasApiKey: Boolean(fullConfig.keys[fullConfig.provider] && fullConfig.keys[fullConfig.provider].length > 0),
+      keys: fullConfig.keys,
+    });
   });
 
   wsServer.on('force:analysis', () => {

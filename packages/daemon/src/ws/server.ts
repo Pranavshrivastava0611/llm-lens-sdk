@@ -2,7 +2,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'node:http';
 import { getRecentInsights, getAgentConfig, updateAgentConfig } from '../store/insights.js';
 import { getRecentMetrics } from '../store/metrics.js';
-
+import { setConfig, getConfig } from '../agent/config.js';
 import { EventEmitter } from 'node:events';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ export class DashboardWsServer extends EventEmitter {
     this.broadcast('insight:ready', insight);
   }
 
-  broadcastConfigUpdated(config: { provider: string; model: string }): void {
+  broadcastConfigUpdated(config: { provider: string; model: string; hasApiKey: boolean; keys?: Record<string, string> }): void {
     this.broadcast('config:updated', config);
   }
 
@@ -122,22 +122,20 @@ export class DashboardWsServer extends EventEmitter {
 
         if (data.provider && !validProviders.includes(data.provider)) return;
 
-        const current = getAgentConfig();
-        const keys = { ...current.keys };
-        if (data.keys) Object.assign(keys, data.keys);
-        if (data.apiKey && data.provider) keys[data.provider] = data.apiKey;
-        else if (data.apiKey) keys[current.provider] = data.apiKey;
-
-        updateAgentConfig({
-          provider: data.provider ?? current.provider,
-          keys,
-          model: data.model ?? current.model,
+        // Use setConfig to correctly update BOTH SQLite and the in-memory cache
+        setConfig({
+          provider: data.provider,
+          model: data.model,
+          apiKey: data.apiKey,
+          keys: data.keys as any,
         });
 
-        const updated = getAgentConfig();
+        const updated = getConfig();
         this.broadcastConfigUpdated({
           provider: updated.provider,
           model: updated.model,
+          hasApiKey: Boolean(updated.keys[updated.provider] && updated.keys[updated.provider].length > 0),
+          keys: updated.keys,
         });
         break;
       }

@@ -87,10 +87,16 @@ export class AutopilotOTelSpan implements Span {
   }
 }
 
+import { trace, context } from '@opentelemetry/api';
+
 export class AutopilotTracer implements Tracer {
-  startSpan(name: string, options?: SpanOptions, context?: Context): Span {
+  startSpan(name: string, options?: SpanOptions, ctx?: Context): Span {
+    const parentCtx = trace.getSpanContext(ctx ?? context.active());
+    
     const span = new AutopilotSpan({ 
-      name, 
+      name,
+      traceId: parentCtx?.traceId,
+      parentSpanId: parentCtx?.spanId,
       attributes: options?.attributes as any,
     });
     
@@ -104,14 +110,13 @@ export class AutopilotTracer implements Tracer {
     const fn = args[args.length - 1];
     const span = this.startSpan(name, options);
     
-    // Simple implementation: just pass the span to the callback.
-    // Full async context propagation is normally handled by @opentelemetry/context-async-hooks,
-    // but for Vercel AI SDK, passing the span natively works for tracking the operation.
-    try {
-        return fn(span);
-    } finally {
-        // Vercel AI SDK handles span.end()
-    }
+    return context.with(trace.setSpan(context.active(), span), () => {
+        try {
+            return fn(span);
+        } finally {
+            // Vercel AI SDK handles span.end()
+        }
+    });
   }
 }
 

@@ -1,33 +1,83 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1a1a1a;
+    --bg-hover: #181818;
+    --border-color: #222222;
+    --border-light: #333333;
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --text-muted: #52525b;
+    /* syntax highlighting */
+    --code-bg: #0c0c0c;
+    --code-string: #ce9178;
+    --code-key: #9cdcfe;
+    
+    /* Scrollbar */
+    --scroll-track: #0a0a0a;
+    --scroll-thumb: #333333;
+    --scroll-thumb-hover: #555555;
+  }
+
+  :root[data-theme="light"] {
+    --bg-primary: #f9fafb;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f3f4f6;
+    --bg-hover: #f3f4f6;
+    --border-color: #e5e7eb;
+    --border-light: #d1d5db;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    /* syntax highlighting */
+    --code-bg: #f3f4f6;
+    --code-string: #059669;
+    --code-key: #2563eb;
+    
+    /* Scrollbar */
+    --scroll-track: #f9fafb;
+    --scroll-thumb: #d1d5db;
+    --scroll-thumb-hover: #9ca3af;
+  }
+}
+
 @theme {
-  --color-bg: #0a0a0a;
-  --color-surface: #111111;
-  --color-border: #1a1a1a;
-  --color-muted: #333333;
-  --color-subtle: #444444;
-  --color-dim: #555555;
-  --color-green: #4ade80;
-  --color-yellow: #eab308;
+  --color-bg: var(--bg-primary);
+  --color-surface: var(--bg-secondary);
+  --color-panel: var(--bg-tertiary);
+  --color-hover: var(--bg-hover);
+  --color-border: var(--border-color);
+  --color-border-light: var(--border-light);
+  --color-content: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-dim: var(--text-muted);
+  --color-code-bg: var(--code-bg);
+  --color-string: var(--code-string);
+  --color-key: var(--code-key);
+  
+  --color-green: #10b981;
+  --color-yellow: #f59e0b;
   --color-orange: #f97316;
   --color-red: #ef4444;
-  --color-blue: #60a5fa;
-  --color-purple: #a78bfa;
-  --color-teal: #34d399;
-  --color-amber: #f59e0b;
-  --color-pink: #ec4899;
+  --color-blue: #3b82f6;
+  --color-purple: #8b5cf6;
+  --color-teal: #14b8a6;
+  
   --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", ui-monospace, monospace;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #333 #0a0a0a;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 }
 
 *::-webkit-scrollbar { width: 6px; height: 6px; }
-*::-webkit-scrollbar-track { background: #0a0a0a; }
-*::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-*::-webkit-scrollbar-thumb:hover { background: #555; }
+*::-webkit-scrollbar-track { background: var(--scroll-track); }
+*::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
 
 @keyframes slideInRight {
   from { transform: translateX(100%); opacity: 0; }
