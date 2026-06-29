@@ -17,7 +17,9 @@ import {
   X, 
   ChevronRight,
   Play,
-  RotateCcw
+  RotateCcw,
+  Sun,
+  FileDown
 } from 'lucide-react';
 import { CODE_PRESETS, MOCK_TRACE_SESSIONS } from '../mockData';
 
@@ -61,8 +63,8 @@ export default function LandingPage({ setCurrentView, setActiveSession }: Landin
               transition={{ duration: 0.5 }}
               className="inline-flex items-center gap-1.5 px-3 py-1 bg-neutral-100 border border-neutral-200 w-fit rounded-full"
             >
-              <span className="font-mono text-xs font-semibold text-brand-orange">NEW</span>
-              <span className="font-sans text-xs text-neutral-500">v2.4.0 stable is now available</span>
+              <span className="font-mono text-xs font-semibold text-brand-orange">NEW IN v2.4.0</span>
+              <span className="font-sans text-xs text-neutral-500">Beautiful Light Mode & Markdown Report Downloads</span>
             </motion.div>
 
             {/* Main Title */}
@@ -208,7 +210,7 @@ export default function LandingPage({ setCurrentView, setActiveSession }: Landin
 
       {/* 3. VALUE PROP GRID */}
       <section className="py-20 px-6 md:px-12 max-w-[1440px] mx-auto">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
           {/* Card 1 */}
           <div className="bg-white border border-neutral-200 p-8 flex flex-col gap-5 hover:shadow-xl hover:border-neutral-400 transition-all duration-300 group rounded-sm">
             <div className="w-12 h-12 flex items-center justify-center bg-neutral-50 rounded border border-neutral-200 group-hover:bg-black group-hover:text-white transition-colors duration-300">
@@ -239,6 +241,17 @@ export default function LandingPage({ setCurrentView, setActiveSession }: Landin
             <h3 className="font-sans text-xl font-bold text-neutral-900">Local-First Privacy</h3>
             <p className="font-sans text-sm text-neutral-500 leading-relaxed">
               PII redaction happens at the edge. Traces are encrypted before they ever leave your infrastructure. SOC2 Type II compliant by default.
+            </p>
+          </div>
+
+          {/* Card 4 */}
+          <div className="bg-white border border-neutral-200 p-8 flex flex-col gap-5 hover:shadow-xl hover:border-neutral-400 transition-all duration-300 group rounded-sm">
+            <div className="w-12 h-12 flex items-center justify-center bg-neutral-50 rounded border border-neutral-200 group-hover:bg-brand-orange group-hover:text-white transition-colors duration-300">
+              <Sun className="w-5 h-5 text-neutral-800 group-hover:text-white transition-colors" />
+            </div>
+            <h3 className="font-sans text-xl font-bold text-neutral-900">Beautiful UI & Reports</h3>
+            <p className="font-sans text-sm text-neutral-500 leading-relaxed">
+              Experience the fully re-designed Light Mode interface and download comprehensive trace insights instantly as Markdown reports for offline sharing.
             </p>
           </div>
         </div>
