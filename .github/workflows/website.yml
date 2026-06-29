@@ -1,0 +1,28 @@
+name: Website CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/website/**'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/website/**'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint --workspace=website
+      - run: npm run build --workspace=website
